@@ -1,0 +1,145 @@
+ TASK-2:flip-flop&counter build
+
+1.D Flip-Flop (Verilog) 
+module d_flip_flop(
+    input clk,
+    input reset,
+    input d,
+    output reg q
+);
+
+always @(posedge clk or posedge reset)
+begin
+    if (reset)
+        q <= 1'b0;
+    else
+        q <= d;
+end
+
+endmodule
+
+
+Testbench
+module tb_d_flip_flop;
+
+reg clk, reset, d;
+wire q;
+
+d_flip_flop uut (
+    .clk(clk),
+    .reset(reset),
+    .d(d),
+    .q(q)
+);
+
+always #5 clk = ~clk;
+
+initial
+begin
+    clk = 0;
+    reset = 1;
+    d = 0;
+
+    #10 reset = 0;
+    #10 d = 1;
+    #10 d = 0;
+    #10 d = 1;
+    #20 $finish;
+end
+
+initial
+begin
+    $monitor("Time=%0t Reset=%b D=%b Q=%b", $time, reset, d, q);
+end
+
+endmodule
+Expected Output
+Time=0   Reset=1 D=0 Q=0
+Time=10  Reset=0 D=0 Q=0
+Time=20  Reset=0 D=1 Q=1
+Time=30  Reset=0 D=0 Q=0
+Time=40  Reset=0 D=1 Q=1
+
+
+2. 4-bit Up Counter (Verilog)
+module up_counter(
+    input clk,
+    input reset,
+    output reg [3:0] count
+);
+
+always @(posedge clk or posedge reset)
+begin
+    if (reset)
+        count <= 4'b0000;
+    else
+        count <= count + 1;
+end
+
+endmodule
+Testbench
+module tb_up_counter;
+
+reg clk, reset;
+wire [3:0] count;
+
+up_counter uut(
+    .clk(clk),
+    .reset(reset),
+    .count(count)
+);
+
+always #5 clk = ~clk;
+
+initial
+begin
+    clk = 0;
+    reset = 1;
+
+    #10 reset = 0;
+
+    #100 $finish;
+end
+
+initial
+begin
+    $monitor("Time=%0t Reset=%b Count=%d", $time, reset, count);
+end
+
+endmodule
+Expected Output
+Time=0    Count=0
+Time=10   Count=0
+Time=15   Count=1
+Time=25   Count=2
+Time=35   Count=3
+Time=45   Count=4
+Time=55   Count=5
+Time=65   Count=6
+Time=75   Count=7
+Time=85   Count=8
+Time=95   Count=9
+Time=105  Count=10
+
+
+Simulation Waveform (Conceptual)
+D Flip-Flop
+CLK : _|‾|_|‾|_|‾|_|‾|_
+D   : 0____111__000__1__
+Q   : 0____111__000__1__
+4-bit Counter
+Clock →  ↑  ↑  ↑  ↑  ↑  ↑
+
+Count:
+0000
+0001
+0010
+0011
+0100
+0101
+0110
+0111
+1000
+1001
+1010
+...
